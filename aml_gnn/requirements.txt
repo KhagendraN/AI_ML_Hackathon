@@ -1,0 +1,20 @@
+# Core ML
+torch
+torch-geometric
+
+# Graph analysis
+networkx
+
+# Data science
+numpy
+pandas
+scikit-learn
+
+# Hyperparameter optimisation
+optuna
+
+# Configuration
+pyyaml
+
+# Utilities
+tqdm
