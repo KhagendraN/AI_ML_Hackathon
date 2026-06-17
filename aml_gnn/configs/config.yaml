@@ -1,0 +1,83 @@
+
+# ============================================================
+#  AML Graph Neural Network — Master Configuration
+# ============================================================
+
+seed: 42
+
+paths:
+  accounts:    "data/raw/accounts.csv"
+  transactions: "data/raw/transactions.csv"
+  output_dir:  "outputs/"
+  checkpoint_dir: "checkpoints/"
+  log_dir:     "logs/"
+
+graph:
+  # Edge feature columns to include from transactions
+  edge_feature_cols:
+    - log_amount
+    - fx_rate_to_npr
+    - cross_border_flag
+    - currency_mismatch
+    - hour_of_day
+    - day_of_week
+    - is_weekend
+    - sender_country_risk
+    - receiver_country_risk
+    - amount_zscore
+    - above_1M_NPR
+    - above_10M_NPR
+    - transmode_A
+    - transmode_B
+    - transmode_E
+    - transmode_F
+    - transmode_J
+    - transmode_P
+    - transmode_Z
+
+  # Node feature columns from accounts
+  node_feature_cols:
+    - pep_flag
+    - sanctions_hit
+    - is_person
+
+model:
+  name: "HeteroGNN"            # HeteroGNN | RGCN | GraphSAGE
+  hidden_channels: 128
+  num_layers: 3
+  dropout: 0.3
+  heads: 4                     # for GAT layers
+  jk_mode: "cat"               # Jumping Knowledge: cat | max | lstm
+  use_edge_features: true
+  node_emb_dim: 64             # embedding dim for categorical node attrs
+
+training:
+  epochs: 100
+  batch_size: 512              # mini-batch neighbour sampling
+  lr: 0.001
+  weight_decay: 1.0e-4
+  early_stopping_patience: 15
+  val_split: 0.15
+  scheduler: "cosine"          # cosine | step | plateau
+  num_neighbours: [25, 10]     # per layer neighbour counts
+  use_pos_weight: true         # handle class imbalance via BCEWithLogitsLoss
+
+optuna:
+  n_trials: 50
+  timeout: 7200                # seconds
+  direction: "maximize"        # maximize ROC-AUC
+  pruner: "MedianPruner"
+  sampler: "TPESampler"
+
+  search_space:
+    hidden_channels: [64, 128, 256]
+    num_layers: [2, 3, 4]
+    dropout: [0.1, 0.5]
+    lr: [1.0e-4, 1.0e-2]
+    weight_decay: [1.0e-5, 1.0e-3]
+    heads: [2, 4, 8]
+
+inference:
+  threshold: 0.5               # score threshold for flagging
+  top_k: 200                   # top-K suspicious accounts in report
+  explainability: true         # run GNNExplainer on flagged nodes
