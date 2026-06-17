@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Notebook artifacts
+.ipynb_checkpoints/
+
+# Local tooling and caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Generated project outputs
+checkpoints/
+logs/
+outputs/
+
+# Optional local data drops
+data/processed/
+data/interim/
